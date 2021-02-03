@@ -1,14 +1,11 @@
 const express = require('express');
-const cors = require('cors');
-
-const port = 4000;
+const serverless = require('serverless-http');
 
 const app = express();
-app.use(express.static('public'));
-app.use(cors());
 
-app.get('/', async (req, res) => {
-	// res.send('Hello World!');
+const router = express.Router();
+
+router.get('/', async (req, res) => {
 	res.append('Access-Control-Allow-Origin', ['*']);
 	res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
 	res.append('Access-Control-Allow-Headers', 'Content-Type');
@@ -18,9 +15,7 @@ app.get('/', async (req, res) => {
 	console.log('response should have been sent:', payload);
 });
 
-app.listen(process.env.PORT || port, () => {
-	console.log(`Express server is listening...`);
-});
+app.use('/.netlify/functions/api', router);
 
 function subscriptionResponse(req) {
 	let payload = {};
@@ -40,3 +35,5 @@ function subscriptionResponse(req) {
 		return payload;
 	}
 }
+
+module.exports.handler = serverless(app);
